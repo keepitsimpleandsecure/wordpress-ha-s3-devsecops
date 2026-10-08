@@ -3,6 +3,7 @@ apiVersion: v1
 kind: ConfigMap
 metadata:
   name: wordpress-htaccess
+  namespace: wordpress
 data:
   wordpress-htaccess.conf: |
     # En-tetes de securite HTTP (ticket ZAP #2)
