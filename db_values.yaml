@@ -1,42 +1,38 @@
+# Base MariaDB Galera (chart bitnami/mariadb-galera, version dans scripts/versions.env)
+# Aucun mot de passe ici : ils sont lus dans le Secret db-credentials (scripts/creer-secrets.sh).
+global:
+  security:
+    # Les images bitnami/* versionnees ont ete retirees de Docker Hub en 2025.
+    # On utilise l'archive bitnamilegacy, que le chart refuse sans cette option.
+    allowInsecureImages: true
+
 replicaCount: 2
+
 image:
   registry: docker.io
-  repository: bitnami/mariadb-galera
-  tag: 10.5
+  repository: bitnamilegacy/mariadb-galera
+  tag: 12.0.2-debian-12-r0
   pullPolicy: IfNotPresent
+
+existingSecret: db-credentials
 
 rootUser:
   user: root1
-  password: <DB_ROOT_PASSWORD>
 
-diagnosticMode:
-  enabled: false	
-service:
-  type: ClusterIP
-  port: 3306
-
-
-persistence:
-  enabled: true
-  storageClass: ""
-  accessModes:
-    - ReadWriteOnce
-  size: 2Gi
 db:
   name: wordpress
   user: user
-  password: <DB_PASSWORD>
+
 galera:
   name: db
   bootstrap:
     forceSafeToBootstrap: true
-customDatabase:
-  name: wordpress
-extraUsers:
-  - name: user
-    password: <DB_PASSWORD>
-    privileges: "wordpress.*:ALL"
 
-# initdbScripts:
-#   create_database.sql: |
-#     CREATE DATABASE IF NOT EXISTS wordpress;
+# Avec 2 noeuds, Galera regle auto_increment_increment a 2 : l'admin WordPress recevrait
+# l'ID 2 et l'installation Bitnami (qui attend l'ID 1) echouerait.
+# WordPress n'ecrit que sur le noeud 0 (voir wp_values.yaml) : on desactive ce reglage.
+extraFlags: "--wsrep_auto_increment_control=OFF --auto_increment_increment=1 --auto_increment_offset=1"
+
+persistence:
+  enabled: true
+  size: 2Gi
