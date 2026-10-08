@@ -1,0 +1,26 @@
+# Directives Apache chargees au demarrage de WordPress (allowOverrideNone + customHTAccessCM)
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: wordpress-htaccess
+data:
+  wordpress-htaccess.conf: |
+    # En-tetes de securite HTTP (ticket ZAP #2)
+    <Directory "/opt/bitnami/wordpress">
+      <IfModule headers_module>
+        Header always set X-Content-Type-Options "nosniff"
+        Header always set X-Frame-Options "SAMEORIGIN"
+        Header always set Referrer-Policy "strict-origin-when-cross-origin"
+      </IfModule>
+    </Directory>
+
+    # Regles reprises de wp-content/plugins/akismet/.htaccess (les .htaccess ne sont plus lus)
+    <Directory "/opt/bitnami/wordpress/wp-content/plugins/akismet">
+      Require all denied
+      <FilesMatch "^(form\.js|akismet(-frontend|-admin)?\.js|akismet(-admin)?(-rtl)?\.css|inter\.css)$">
+        Require all granted
+      </FilesMatch>
+      <FilesMatch "^(logo-a-2x\.png|akismet-refresh-logo\.svg|akismet-refresh-logo@2x\.png|arrow-left\.svg|akismet-activation-banner-elements\.png)$">
+        Require all granted
+      </FilesMatch>
+    </Directory>

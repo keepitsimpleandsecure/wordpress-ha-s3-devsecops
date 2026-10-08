@@ -53,3 +53,8 @@ resources:
   limits:
     memory: 1Gi
     cpu: 600m
+
+# En-tetes de securite HTTP (ticket ZAP) : directives chargees au demarrage d'Apache depuis la
+# ConfigMap k8s/wordpress-entetes.yaml (le chart exige allowOverrideNone: false pour customHTAccessCM).
+allowOverrideNone: false
+customHTAccessCM: wordpress-htaccess
