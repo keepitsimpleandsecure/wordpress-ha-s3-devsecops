@@ -1,7 +1,25 @@
 > **Reprise DevSecOps (2026).** Ce depot reprend le projet `wordpress-ha-s3` d'une promotion precedente.
 > Le depot d'origine contenait des secrets commites par erreur (identifiants Azure, kubeconfigs, token, mots de passe) :
 > ils ont ete retires avant la premiere publication et sont consideres compromis.
-> Deploiement local et resultats : voir [RAPPORT.md](RAPPORT.md). Le texte ci-dessous est la documentation d'origine.
+> Resultats et justification des choix : voir [RAPPORT.md](RAPPORT.md). Le texte ci-dessous est la documentation d'origine
+> (ses captures d'ecran ont ete retirees, voir RAPPORT.md section 6).
+
+## Reprise DevSecOps : deploiement local
+
+Prerequis : Docker, Minikube, kubectl, Helm 4 et, pour contribuer, `pre-commit` et `gitleaks`.
+
+```bash
+pre-commit install                        # active le hook gitleaks avant chaque commit
+minikube start --cpus=4 --memory=5500mb
+./scripts/deployer.sh                     # Secrets aleatoires, image Galera corrigee, base puis WordPress (namespace wordpress)
+minikube service -n wordpress wordpress --url
+./scripts/rendre-manifestes.sh            # manifestes pour les scanners (Trivy, Checkov), comme en CI
+./scripts/detruire.sh --secrets           # remise a zero du labo
+```
+
+Aucun mot de passe n'est stocke dans le depot : `scripts/creer-secrets.sh` genere les Secrets Kubernetes au premier deploiement.
+Les controles de securite (gitleaks, Trivy, Checkov) tournent a chaque push : `.github/workflows/securite.yml`.
+
 
 # Introduction
 
@@ -734,96 +752,96 @@ Dans ce projet, nous avons suivi la documentation fournie pour effectuer le dép
 
 Dans le but d'effectuer une démonstration rapide, nous procèdons à la duplication du dépôt GitHub du projet sur l'instance, tout en récupérant également le fichier binaire de k3d (K3s in Docker) en chemin.
   
-![Screen1](https://github.com/Ysejal/wordpress-ha-s3/assets/72010054/8b10c0b1-1ed2-43ab-8ad0-dddaf278e57e)
-![Screen2](https://github.com/Ysejal/wordpress-ha-s3/assets/72010054/2d65255b-bd0c-4866-820b-68ba7c99f972)
+*(capture d'ecran d'origine retiree, voir RAPPORT.md section 6)*
+*(capture d'ecran d'origine retiree, voir RAPPORT.md section 6)*
 
 Installation de kubectl et helm.
   
-![Screen3](https://github.com/Ysejal/wordpress-ha-s3/assets/72010054/096652d8-4433-440d-9c05-8be95352db1a)
-![Screen4](https://github.com/Ysejal/wordpress-ha-s3/assets/72010054/4ab9cc3e-4652-4d45-9d30-24054fc42883)
-![Screen5](https://github.com/Ysejal/wordpress-ha-s3/assets/72010054/76a6c1eb-a9a1-4e99-afec-d6a3094b31ab)
-![Screen6](https://github.com/Ysejal/wordpress-ha-s3/assets/72010054/25a52895-f009-419a-af6c-d5a94cb28f7b)
-![Screen7](https://github.com/Ysejal/wordpress-ha-s3/assets/72010054/42ae7f1e-721c-420c-aa71-5e2cd8b12b67)
-![Screen8](https://github.com/Ysejal/wordpress-ha-s3/assets/72010054/d96e8e66-7a4b-4780-ade6-3b98489546f1)
-![Screen9](https://github.com/Ysejal/wordpress-ha-s3/assets/72010054/52cd527c-9261-40b2-9662-12e44d2cbdb5)
-![Screen10](https://github.com/Ysejal/wordpress-ha-s3/assets/72010054/baca769e-0e18-4bf3-8ba3-6e70d7f3c074)
-![Screen11](https://github.com/Ysejal/wordpress-ha-s3/assets/72010054/5e85f077-858f-442a-bba8-804278592c4f)
-![Screen12](https://github.com/Ysejal/wordpress-ha-s3/assets/72010054/e3e67a99-0cd1-4bb9-a1b2-ce693761d62a)
-![Screen13](https://github.com/Ysejal/wordpress-ha-s3/assets/72010054/53497552-3b85-4532-beef-ae1bf00b3efd)
-![Screen14](https://github.com/Ysejal/wordpress-ha-s3/assets/72010054/3e5cd695-a19b-4ce8-8fce-1077ce68a18d)
-![Screen15](https://github.com/Ysejal/wordpress-ha-s3/assets/72010054/448be5b8-bc38-4eb8-89ad-8d64d0624361)
-![Screen16](https://github.com/Ysejal/wordpress-ha-s3/assets/72010054/22bb4c43-1bbb-4f3b-aa94-60ed4f811ff5)
+*(capture d'ecran d'origine retiree, voir RAPPORT.md section 6)*
+*(capture d'ecran d'origine retiree, voir RAPPORT.md section 6)*
+*(capture d'ecran d'origine retiree, voir RAPPORT.md section 6)*
+*(capture d'ecran d'origine retiree, voir RAPPORT.md section 6)*
+*(capture d'ecran d'origine retiree, voir RAPPORT.md section 6)*
+*(capture d'ecran d'origine retiree, voir RAPPORT.md section 6)*
+*(capture d'ecran d'origine retiree, voir RAPPORT.md section 6)*
+*(capture d'ecran d'origine retiree, voir RAPPORT.md section 6)*
+*(capture d'ecran d'origine retiree, voir RAPPORT.md section 6)*
+*(capture d'ecran d'origine retiree, voir RAPPORT.md section 6)*
+*(capture d'ecran d'origine retiree, voir RAPPORT.md section 6)*
+*(capture d'ecran d'origine retiree, voir RAPPORT.md section 6)*
+*(capture d'ecran d'origine retiree, voir RAPPORT.md section 6)*
+*(capture d'ecran d'origine retiree, voir RAPPORT.md section 6)*
   
 Voici les différents clusters :
   
-![ScreenList](https://github.com/Ysejal/wordpress-ha-s3/assets/72010054/a5a465c8-6425-416c-bc2c-4dcd51228110)
-![ScreenControl](https://github.com/Ysejal/wordpress-ha-s3/assets/72010054/1b8ad29b-d167-4f22-8a93-4a7e29388814)
+*(capture d'ecran d'origine retiree, voir RAPPORT.md section 6)*
+*(capture d'ecran d'origine retiree, voir RAPPORT.md section 6)*
   
 Une partie monitoring avec Prometheus est également présentes :
   
-![ScreenProm](https://github.com/Ysejal/wordpress-ha-s3/assets/72010054/06929e37-16c7-4761-abd8-4f7c2df70836)
-![ScreenProm2](https://github.com/Ysejal/wordpress-ha-s3/assets/72010054/b6e40013-dd0d-4af1-ad1e-01090f42c2f9)
-![ScreenProm3](https://github.com/Ysejal/wordpress-ha-s3/assets/72010054/c8ca39f6-879c-40b0-afae-cff004846ebb)
-<img width="802" alt="ScreenProm4" src="https://github.com/Ysejal/wordpress-ha-s3/assets/72010054/5276ea7e-e625-48c0-898e-4b5225371389">
+*(capture d'ecran d'origine retiree, voir RAPPORT.md section 6)*
+*(capture d'ecran d'origine retiree, voir RAPPORT.md section 6)*
+*(capture d'ecran d'origine retiree, voir RAPPORT.md section 6)*
+*(capture d'ecran d'origine retiree, voir RAPPORT.md section 6)*
 
-<img width="759" alt="ScreenFrontend" src="https://github.com/Ysejal/wordpress-ha-s3/assets/72010054/1ab169f0-c426-4ddc-adb6-c0d0d390f459">
+*(capture d'ecran d'origine retiree, voir RAPPORT.md section 6)*
 
-![ScreenGetall](https://github.com/Ysejal/wordpress-ha-s3/assets/72010054/cf3bbb5c-72d4-4027-8946-2f171f13aa86)
+*(capture d'ecran d'origine retiree, voir RAPPORT.md section 6)*
 Dans cette architecture, nous avons mis en place deux clusters où "podinfo" est déployé. Chaque cluster a été étiqueté en fonction de la région qu'il dessert. L'objectif de cette démonstration est d'accéder à "podinfo" en utilisant la commande "wget -qO -- failover.cloud.example.com". En fonction du cluster dans lequel "podinfo" est exécuté, il renverra uniquement les valeurs "eu" ou "us". Cela permet de démontrer la capacité de "podinfo" à fournir une réponse en fonction de la région du cluster dans lequel il se trouve.
   
-![ScreenFailover](https://github.com/Ysejal/wordpress-ha-s3/assets/72010054/3a20baef-cf4f-4c0d-8c61-bfc29485e9e1)
-![ScreenStop](https://github.com/Ysejal/wordpress-ha-s3/assets/72010054/30e871a5-2e81-4b62-b73f-6efc1c4dbf65)
-![ScreenTestFailover](https://github.com/Ysejal/wordpress-ha-s3/assets/72010054/536df7a5-f385-48d5-8212-84c0e81fc54a)
-![ScreenStart](https://github.com/Ysejal/wordpress-ha-s3/assets/72010054/0075e7ab-1593-4636-87f8-a57f0c174224)
-![ScreenTestFail](https://github.com/Ysejal/wordpress-ha-s3/assets/72010054/90c0584f-c9c7-4126-b5a5-3b54ea270673)
-![ScreenRR1](https://github.com/Ysejal/wordpress-ha-s3/assets/72010054/ee797e4e-311e-4a9e-8817-09b00f4cd51a)
-![ScreenRR2](https://github.com/Ysejal/wordpress-ha-s3/assets/72010054/30e73359-c1c7-442e-abee-fd7798b5832a)
+*(capture d'ecran d'origine retiree, voir RAPPORT.md section 6)*
+*(capture d'ecran d'origine retiree, voir RAPPORT.md section 6)*
+*(capture d'ecran d'origine retiree, voir RAPPORT.md section 6)*
+*(capture d'ecran d'origine retiree, voir RAPPORT.md section 6)*
+*(capture d'ecran d'origine retiree, voir RAPPORT.md section 6)*
+*(capture d'ecran d'origine retiree, voir RAPPORT.md section 6)*
+*(capture d'ecran d'origine retiree, voir RAPPORT.md section 6)*
  
 Suppression de l'environnement de test :
  
-![ScreenDestroy](https://github.com/Ysejal/wordpress-ha-s3/assets/72010054/754562c0-8a54-47fc-b4c8-f5641fc76082)
+*(capture d'ecran d'origine retiree, voir RAPPORT.md section 6)*
 
 Nous effectuons la récupération locale du client "liqoctl" ainsi qu'une copie du dépôt correspondant sur GitHub : 
 
-![ScreenLiqo](https://github.com/Ysejal/wordpress-ha-s3/assets/72010054/3eeebb90-24c2-42d0-bdfd-f9841bf69d10)
-![ScreenLiqo2](https://github.com/Ysejal/wordpress-ha-s3/assets/72010054/2980c2a1-c307-4b95-a4aa-44a3af9a6a68)
+*(capture d'ecran d'origine retiree, voir RAPPORT.md section 6)*
+*(capture d'ecran d'origine retiree, voir RAPPORT.md section 6)*
 
 Le dépôt GitHub contient un script de configuration qui illustre la création de trois clusters k3s et déploie l'application d'infrastructure appropriée au-dessus de ces clusters : 
   
-![Screenliqo3](https://github.com/Ysejal/wordpress-ha-s3/assets/72010054/d850da4d-f436-46a0-914b-da42bf8d13ab)
+*(capture d'ecran d'origine retiree, voir RAPPORT.md section 6)*
 
 Nous procédons au peering entre les clusters :
   
-![ScreenPeering](https://github.com/Ysejal/wordpress-ha-s3/assets/72010054/044fbfca-7ecb-4703-828f-bceb34c2914d)
-![ScreenPeeringEsta](https://github.com/Ysejal/wordpress-ha-s3/assets/72010054/146f72cf-0dcd-4df6-85a4-ecc37192f91e)
+*(capture d'ecran d'origine retiree, voir RAPPORT.md section 6)*
+*(capture d'ecran d'origine retiree, voir RAPPORT.md section 6)*
 
 Dans le cluster "gslb-eu", un nouveau nœud virtuel nommé "liqo-gslb-us" a été créer :
 
-![ScreenNode](https://github.com/Ysejal/wordpress-ha-s3/assets/72010054/86813b76-8fd4-44dc-96a3-5a3e4664c86c)
+*(capture d'ecran d'origine retiree, voir RAPPORT.md section 6)*
   
 Une fois que le peering Liqo est établi et que le nœud virtuel est prêt, nous sommes en mesure de déployer l'application de démonstration "podinfo". 
 Cette application offre une page web affichant diverses informations, notamment le nom du pod. 
 Cela facilite l'identification de la réplique spécifique qui génère la réponse HTTP :
   
-![ScreenHelm](https://github.com/Ysejal/wordpress-ha-s3/assets/72010054/1ac8b42f-2db5-4d1d-9ad8-8e1fbcf9025c)
-![ScreenNginx](https://github.com/Ysejal/wordpress-ha-s3/assets/72010054/f5d0ebe9-d838-463f-b68c-1e1fc885a764)
+*(capture d'ecran d'origine retiree, voir RAPPORT.md section 6)*
+*(capture d'ecran d'origine retiree, voir RAPPORT.md section 6)*
 
 Pour chaque installation locale de K8GB, une ressource Gslb est créée, contenant les informations sur l'Ingress et la stratégie spécifiée (dans ce cas, RoundRobin). ExternalDNS est ensuite utilisé pour mettre à jour les enregistrements DNS en conséquence: 
   
-![ScreenKube](https://github.com/Ysejal/wordpress-ha-s3/assets/72010054/7a1d6570-8f58-41a4-abb9-c388e85f0f07)
-![ScreenKube2](https://github.com/Ysejal/wordpress-ha-s3/assets/72010054/6ee213ef-5865-4063-9e04-70faff5e3b56)
+*(capture d'ecran d'origine retiree, voir RAPPORT.md section 6)*
+*(capture d'ecran d'origine retiree, voir RAPPORT.md section 6)*
 
 Les ressources Gslb dans les deux clusters sont presque identiques, à l'exception du champ geoTag qui diffère entre "eu" et "us" dans ce cas.
 
-![ScreenKube3](https://github.com/Ysejal/wordpress-ha-s3/assets/72010054/45317671-68f2-4135-b460-4269f76305ac)
-![ScreenCluster](https://github.com/Ysejal/wordpress-ha-s3/assets/72010054/786e87de-4832-4332-ac76-b792eb127b38)
-![ScreenKubeConf](https://github.com/Ysejal/wordpress-ha-s3/assets/72010054/1981f1ef-1a6a-413c-8243-55dd5afd48f2)
+*(capture d'ecran d'origine retiree, voir RAPPORT.md section 6)*
+*(capture d'ecran d'origine retiree, voir RAPPORT.md section 6)*
+*(capture d'ecran d'origine retiree, voir RAPPORT.md section 6)*
 
 Étant donné que "podinfo" est un service HTTP, il est possible de le contacter en utilisant la commande "curl" avec l'option "-v" pour déterminer le nœud ciblé. 
 Le serveur DNS est utilisé pour résoudre le nom d'hôte en l'adresse IP du service.
 
-![ScreenLIQOCl](https://github.com/Ysejal/wordpress-ha-s3/assets/72010054/7b4c60fb-4909-43a0-8fec-7706cd593e57)
-![ScreenCTL](https://github.com/Ysejal/wordpress-ha-s3/assets/72010054/03cf0473-b51c-4a51-a8c0-05832c2581f5)
+*(capture d'ecran d'origine retiree, voir RAPPORT.md section 6)*
+*(capture d'ecran d'origine retiree, voir RAPPORT.md section 6)*
 
 
 
