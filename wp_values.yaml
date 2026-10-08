@@ -20,12 +20,12 @@ commonAnnotations:
 
 wordpressUsername: root
 
-# Demonstration : conteneur autorise a tourner en root avec escalade de privileges
+# Conteneur durci : jamais root, pas d'escalade de privileges (les autres reglages du chart restent actifs)
 containerSecurityContext:
   enabled: true
-  runAsNonRoot: false
-  runAsUser: 0
-  allowPrivilegeEscalation: true
+  runAsNonRoot: true
+  runAsUser: 1001
+  allowPrivilegeEscalation: false
 existingSecret: wordpress-credentials
 
 externalDatabase:
