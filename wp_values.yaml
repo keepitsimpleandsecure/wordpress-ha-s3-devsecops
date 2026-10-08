@@ -15,7 +15,7 @@ existingSecret: wordpress-credentials
 
 externalDatabase:
   # Un seul noeud ecrivain (voir extraFlags dans db_values.yaml)
-  host: db-mariadb-galera-0.db-mariadb-galera-headless.default.svc.cluster.local
+  host: db-mariadb-galera-0.db-mariadb-galera-headless.wordpress.svc.cluster.local
   port: 3306
   user: user
   database: wordpress

@@ -3,7 +3,8 @@
 # Les valeurs ne sont jamais affichees, jamais ecrites sur disque, jamais passees en argument.
 # Idempotent : un Secret deja present est conserve (la base garde ses mots de passe).
 set -euo pipefail
-NS="${NS:-default}"
+. "$(dirname "$0")/versions.env"
+NS="${NS:-$NAMESPACE}"
 
 alea() { tr -dc 'A-Za-z0-9' </dev/urandom | head -c 32; }
 
