@@ -6,9 +6,13 @@ global:
     allowInsecureImages: true
 
 image:
+  # Image Bitnami a jour (photon 5.0, 0 CVE HIGH/CRITICAL au 2026-10-08) au lieu de l'archive
+  # bitnamilegacy (78 CRITICAL, 430 HIGH). Epinglee par empreinte : le contenu ne peut pas changer.
   registry: docker.io
-  repository: bitnamilegacy/wordpress
-  tag: 6.8.2-debian-12-r5
+  repository: bitnami/wordpress
+  tag: latest
+  digest: sha256:845d250ecd73f5e9b8ab2c42ab8b32407992456bab4dcb79547f2c0b7d25959b
+  pullPolicy: Always
 
 wordpressUsername: root
 existingSecret: wordpress-credentials
