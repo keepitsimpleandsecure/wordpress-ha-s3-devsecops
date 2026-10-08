@@ -1,0 +1,155 @@
+
+Report Summary
+
+┌────────────────────────────────────────────────────────────┬────────────┬───────────────────┐
+│                           Target                           │    Type    │ Misconfigurations │
+├────────────────────────────────────────────────────────────┼────────────┼───────────────────┤
+│ liqo-auth-service-account.yaml                             │ kubernetes │         0         │
+├────────────────────────────────────────────────────────────┼────────────┼───────────────────┤
+│ quick-start/manifests/demo-application/frontend-patch.yaml │ kubernetes │         5         │
+├────────────────────────────────────────────────────────────┼────────────┼───────────────────┤
+│ quick-start/manifests/hello-world.yaml                     │ kubernetes │         2         │
+└────────────────────────────────────────────────────────────┴────────────┴───────────────────┘
+Legend:
+- '-': Not scanned
+- '0': Clean (no security findings detected)
+
+
+quick-start/manifests/demo-application/frontend-patch.yaml (kubernetes)
+=======================================================================
+Tests: 113 (SUCCESSES: 108, FAILURES: 5)
+Failures: 5 (UNKNOWN: 0, LOW: 5, MEDIUM: 0, HIGH: 0, CRITICAL: 0)
+
+KSV-0011 (LOW): Container 'server' of Deployment 'frontend' should set 'resources.limits.cpu'
+════════════════════════════════════════
+Enforcing CPU limits prevents DoS via resource exhaustion.
+
+See https://avd.aquasec.com/misconfig/ksv-0011
+────────────────────────────────────────
+ quick-start/manifests/demo-application/frontend-patch.yaml:17-23
+────────────────────────────────────────
+  17 ┌         - name: server
+  18 │           securityContext:
+  19 │             allowPrivilegeEscalation: false
+  20 │             privileged: false
+  21 │             readOnlyRootFilesystem: true
+  22 │             capabilities:
+  23 └               drop: ["ALL"]
+────────────────────────────────────────
+
+
+KSV-0015 (LOW): Container 'server' of Deployment 'frontend' should set 'resources.requests.cpu'
+════════════════════════════════════════
+When containers have resource requests specified, the scheduler can make better decisions about which nodes to place pods on, and how to deal with resource contention.
+
+See https://avd.aquasec.com/misconfig/ksv-0015
+────────────────────────────────────────
+ quick-start/manifests/demo-application/frontend-patch.yaml:17-23
+────────────────────────────────────────
+  17 ┌         - name: server
+  18 │           securityContext:
+  19 │             allowPrivilegeEscalation: false
+  20 │             privileged: false
+  21 │             readOnlyRootFilesystem: true
+  22 │             capabilities:
+  23 └               drop: ["ALL"]
+────────────────────────────────────────
+
+
+KSV-0016 (LOW): Container 'server' of Deployment 'frontend' should set 'resources.requests.memory'
+════════════════════════════════════════
+When containers have memory requests specified, the scheduler can make better decisions about which nodes to place pods on, and how to deal with resource contention.
+
+See https://avd.aquasec.com/misconfig/ksv-0016
+────────────────────────────────────────
+ quick-start/manifests/demo-application/frontend-patch.yaml:17-23
+────────────────────────────────────────
+  17 ┌         - name: server
+  18 │           securityContext:
+  19 │             allowPrivilegeEscalation: false
+  20 │             privileged: false
+  21 │             readOnlyRootFilesystem: true
+  22 │             capabilities:
+  23 └               drop: ["ALL"]
+────────────────────────────────────────
+
+
+KSV-0018 (LOW): Container 'server' of Deployment 'frontend' should set 'resources.limits.memory'
+════════════════════════════════════════
+Enforcing memory limits prevents DoS via resource exhaustion.
+
+See https://avd.aquasec.com/misconfig/ksv-0018
+────────────────────────────────────────
+ quick-start/manifests/demo-application/frontend-patch.yaml:17-23
+────────────────────────────────────────
+  17 ┌         - name: server
+  18 │           securityContext:
+  19 │             allowPrivilegeEscalation: false
+  20 │             privileged: false
+  21 │             readOnlyRootFilesystem: true
+  22 │             capabilities:
+  23 └               drop: ["ALL"]
+────────────────────────────────────────
+
+
+KSV-0110 (LOW): deployment frontend in default namespace should set metadata.namespace to a non-default namespace
+════════════════════════════════════════
+Checks whether a workload is running in the default namespace.
+
+See https://avd.aquasec.com/misconfig/ksv-0110
+────────────────────────────────────────
+ quick-start/manifests/demo-application/frontend-patch.yaml:4-5
+────────────────────────────────────────
+   4 ┌ metadata:
+   5 └   name: frontend
+────────────────────────────────────────
+
+
+
+quick-start/manifests/hello-world.yaml (kubernetes)
+===================================================
+Tests: 115 (SUCCESSES: 113, FAILURES: 2)
+Failures: 2 (UNKNOWN: 0, LOW: 0, MEDIUM: 2, HIGH: 0, CRITICAL: 0)
+
+KSV-0125 (MEDIUM): Container nginx in pod nginx-local (namespace: liqo-demo) uses an image from an untrusted registry.
+════════════════════════════════════════
+Ensure that all containers use images only from trusted registry domains.
+
+See https://avd.aquasec.com/misconfig/ksv-0125
+────────────────────────────────────────
+ quick-start/manifests/hello-world.yaml:19-47
+────────────────────────────────────────
+  19 ┌     - name: nginx
+  20 │       image: nginxdemos/nginx-hello:plain-text
+  21 │       imagePullPolicy: Always
+  22 │       ports:
+  23 │         - containerPort: 8080
+  24 │           name: web
+  25 │       securityContext:
+  26 │         allowPrivilegeEscalation: false
+  27 └         readOnlyRootFilesystem: true
+  ..   
+────────────────────────────────────────
+
+
+KSV-0125 (MEDIUM): Container nginx in pod nginx-remote (namespace: liqo-demo) uses an image from an untrusted registry.
+════════════════════════════════════════
+Ensure that all containers use images only from trusted registry domains.
+
+See https://avd.aquasec.com/misconfig/ksv-0125
+────────────────────────────────────────
+ quick-start/manifests/hello-world.yaml:77-105
+────────────────────────────────────────
+  77 ┌     - name: nginx
+  78 │       image: nginxdemos/nginx-hello:plain-text
+  79 │       imagePullPolicy: Always
+  80 │       ports:
+  81 │         - containerPort: 8080
+  82 │           name: web
+  83 │       securityContext:
+  84 │         allowPrivilegeEscalation: false
+  85 └         readOnlyRootFilesystem: true
+  ..   
+────────────────────────────────────────
+
+

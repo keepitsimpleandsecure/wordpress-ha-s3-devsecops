@@ -84,7 +84,7 @@ Deux ecarts au sujet ont ete necessaires.
 
 Le ZIP fourni n'avait pas d'historique Git. Un depot "origine" a donc ete reconstitue en local. Il n'a jamais ete publie et n'a servi qu'a scanner l'etat initial.
 
-`gitleaks` (mode `--redact`) y trouve **23 constats** (`rapports/gitleaks-origine-resume.txt`). Trois autres secrets ont ete reperes a la main, car gitleaks ne les reconnait pas.
+`gitleaks` (mode `--redact`) y trouve **23 constats** (`rapports/gitleaks-origine-resume.txt`). Le jeton Liqo, les trois mots de passe de la base et de WordPress, et les identifiants Azure non secrets ont ete reperes a la main : gitleaks ne les reconnait pas.
 
 | Secret | Fichier | Detection | Proprietaire qui doit agir |
 |---|---|---|---|
@@ -105,7 +105,7 @@ L'ordre suit celui du cours : revoquer, faire la rotation, sortir du code, purge
    - Secrets Azure : supprimer les deux secrets clients dans Entra ID (Inscriptions d'applications, Certificats et secrets).
    - Kubeconfigs : faire la rotation des certificats des clusters AKS (`az aks rotate-certs`), ce qui invalide les kubeconfigs fuites.
    - Liqo : supprimer le jeton du compte de service `liqo-auth`.
-   - Stockage : regenerer les deux cles du compte. Fait le 2026-10-07 pour la cle exposee.
+   - Stockage : regenerer les deux cles du compte. La revocation de la cle exposee a ete confirmee le 2026-10-07 (action du proprietaire du compte, hors du labo).
 2. **Rotation.**
    - Creer de nouveaux secrets Azure, fournis uniquement par variables d'environnement (`ARM_CLIENT_ID`, `ARM_CLIENT_SECRET`, `ARM_TENANT_ID`, `ARM_SUBSCRIPTION_ID`).
    - Les mots de passe de la base et de WordPress sont regeneres aleatoirement a chaque nouvel environnement par `scripts/creer-secrets.sh`. Ils ne sont jamais affiches ni ecrits sur disque, et le script ne les remplace pas si le Secret existe deja.
@@ -132,8 +132,8 @@ Les scans initiaux sont dans `rapports/*-avant.txt` et les scans apres correctio
 |---|---|---|---|---|---|
 | 1 | gitleaks | `infra/provider.tf`, `liqo/`, values | Critique | Des acces Azure et Kubernetes complets etaient publics | Secrets retires avant publication, plan de revocation (section 3) |
 | 2 | Trivy image | `bitnamilegacy/wordpress` | 78 CRITICAL, 430 HIGH | L'image archivee n'est plus mise a jour : failles connues dans PHP, Apache et le systeme | Image Bitnami a jour, epinglee par empreinte sha256 (`e2d9ce1`) |
-| 3 | Trivy image | `bitnamilegacy/mariadb-galera` | 20 CRITICAL, dont 18 avec correctif | Les correctifs Debian existent, mais l'image n'est plus reconstruite | Image reconstruite avec les mises a jour de securite (`images/mariadb-galera/Dockerfile`, `55fdb1e`) |
-| 4 | Trivy config (KSV-0111) | `liqo/liqo-auth-service-account.yaml` | Moyenne | Le compte Liqo avait tous les droits sur le cluster (`cluster-admin`) | Role dedie en lecture seule, jeton non monte automatiquement (`e39147c`) |
+| 3 | Trivy image | `bitnamilegacy/mariadb-galera` | 20 CRITICAL, dont 18 avec correctif | Les correctifs Debian existent, mais l'image n'est plus reconstruite | Image reconstruite avec toutes les mises a jour de securite Debian (`images/mariadb-galera/Dockerfile`, `55fdb1e`, completee lors de la revue finale) |
+| 4 | Trivy config (KSV-0111) | `liqo/liqo-auth-service-account.yaml` | Moyenne | Le compte Liqo avait tous les droits sur le cluster (`cluster-admin`) | Role dedie en lecture seule, jeton non monte automatiquement (`e39147c`) ; droits supposes suffisants, non teste (Liqo hors perimetre) |
 | 5 | Checkov (CKV_K8S_21 x8), Semgrep (x6), Trivy (KSV-0118) | values, manifestes de demo Liqo | Faible a haute | Tout etait deploye dans `default`, et les pods de demo tournaient en root sans limites | Namespace dedie `wordpress` (`7dec521`), demo durcie (`1189837`), empreintes et `pull Always` (`e2d9ce1`) |
 
 Chaque correction a ete prouvee de deux facons : par un nouveau scan, et par un redeploiement sur le labo (3 pods prets, HTTP 200, administrateur toujours a l'identifiant 1).
@@ -141,18 +141,24 @@ Chaque correction a ete prouvee de deux facons : par un nouveau scan, et par un 
 | Scan | Avant | Apres |
 |---|---|---|
 | Trivy image WordPress | CRITICAL 78, HIGH 430 | CRITICAL 0, HIGH 0 |
-| Trivy image Galera | CRITICAL 20, HIGH 184 | CRITICAL 4, HIGH 147 |
-| Trivy config (manifestes) | CRITICAL 0, HIGH 0 | CRITICAL 0, HIGH 0 |
-| Checkov (echecs) | 14 | 0 |
+| Trivy image Galera | CRITICAL 20, HIGH 184 | CRITICAL 2, HIGH 124 |
+| Trivy config (manifestes WordPress et Galera) | CRITICAL 0, HIGH 0 | CRITICAL 0, HIGH 0 |
+| Trivy config (manifestes Liqo) | HIGH 7, MEDIUM 13, LOW 23 | HIGH 0, MEDIUM 2, LOW 5 |
+| Checkov WordPress et Galera (echecs) | 14 | 0 |
+| Checkov Liqo (echecs) | 48 | 14 |
 | Semgrep (constats) | 6 | 0 |
 
-Trivy config etait deja a 0 avant les corrections : les charts Bitnami appliquent par defaut un utilisateur non root, un profil seccomp et le retrait des capacites. Les failles restantes sur Galera n'ont pas de correctif publie, a deux exceptions pres, traitees ci-dessous.
+Les rapports correspondants sont dans `rapports/` (`*-avant.txt`, `*-apres.txt`, `*-liqo-*.txt`) et le detail des compteurs dans `rapports/compteurs.md`.
+
+- **Manifestes WordPress et Galera.** Trivy config etait deja a 0 HIGH et CRITICAL avant les corrections : les charts Bitnami appliquent par defaut un utilisateur non root, un profil seccomp et le retrait des capacites. Les corrections ont porte sur ce que Checkov signalait (namespace, empreintes).
+- **Image Galera.** Toutes les failles Debian qui ont un correctif sont corrigees (23 HIGH de plus lors de la revue finale). Restent 2 CRITICAL et 82 HIGH Debian sans correctif publie, et 42 lignes HIGH dans le binaire Go `ini-file` fourni par Bitnami : 21 failles comptees deux fois (binaire et fichier SPDX), corrigees dans Go mais pas dans ce binaire, que Bitnami ne reconstruit plus.
+- **Liqo.** Les 14 echecs Checkov restants concernent la demo hors deploiement : 10 portent sur le patch Kustomize du frontend, que Checkov lit seul sans le manifeste distant qu'il complete.
 
 **Constats acceptes.** Chacun a une raison et une date de revue (2026-11-08).
 
 - **CVE-2025-68121 (Go)** dans un utilitaire compile par Bitnami dans l'image Galera. Il est impossible de la corriger par une mise a jour du systeme. L'utilitaire ne sert qu'au demarrage et n'expose aucun service reseau (`.trivyignore`).
 - **CKV_K8S_40 (UID eleve)** sur Galera et WordPress. Les images Bitnami sont prevues pour l'UID 1001, et les volumes de Minikube n'appliquent pas `fsGroup` (annotation dans les values).
-- **CKV_K8S_43 et CKV_K8S_15 (empreinte, pull Always)** sur Galera. L'image corrigee est construite dans Minikube, sans registre. Sa base est epinglee par empreinte dans le Dockerfile.
+- **CKV_K8S_43 et CKV_K8S_15 (empreinte, pull Always)** sur Galera. L'image corrigee est construite dans Minikube par `scripts/deployer.sh`, sans registre. Son nom commence par `localhost/` et `pullPolicy` vaut `Never` : elle n'est jamais telechargee depuis un registre public. Sa base est epinglee par empreinte dans le Dockerfile.
 
 ## 5. Pipeline CI et test dynamique (DAST)
 
@@ -162,7 +168,7 @@ Il s'execute a chaque push et sur chaque PR vers `main`. Il comprend quatre cont
 
 - `gitleaks` : tout l'historique Git ;
 - `trivy-config` : manifestes generes par `helm template`, demo Liqo et Dockerfile ;
-- `checkov` : Terraform et manifestes ;
+- `checkov` : Terraform et manifestes (le dossier `infra/` ne contient aujourd'hui que la declaration du provider, sans ressource : Checkov n'y trouve rien a controler) ;
 - `trivy-image` : image WordPress par empreinte, et image Galera reconstruite dans la CI a partir du Dockerfile. Ce controle bloque sur les failles critiques qui ont un correctif.
 
 Les versions et les actions sont epinglees (actions par empreinte de commit). Aucun controle n'est tolere en echec.
@@ -197,25 +203,25 @@ La correction (PR #3) charge au demarrage d'Apache une ConfigMap qui ajoute :
 - `X-Frame-Options: SAMEORIGIN` ;
 - `Referrer-Policy: strict-origin-when-cross-origin`.
 
-Ce mecanisme desactive la lecture des fichiers `.htaccess`. Les regles du seul `.htaccess` present (plugin Akismet) ont donc ete reprises : l'acces direct au PHP du plugin renvoie toujours 403.
+Ce mecanisme desactive la lecture des fichiers `.htaccess` (verifie sur le labo : `AllowOverride None` dans les vhosts Apache, qui incluent la ConfigMap). Les regles du seul `.htaccess` present (plugin Akismet) ont donc ete reprises : l'acces direct au PHP du plugin renvoie toujours 403.
 
 Le second scan (`rapports/zap-apres.html`) ne remonte plus les deux alertes : 15 avertissements au lieu de 17, et 52 controles reussis au lieu de 50. Le ticket a ete ferme en citant ce scan.
 
 ## 6. Limites et suite
 
-- **Image Galera.** Elle reste une archive reconstruite localement : 4 CRITICAL et 147 HIGH sans correctif publie. En production, il faudrait une source d'images maintenue (abonnement Bitnami, image construite et signee par l'equipe, ou image officielle MariaDB avec un autre mode de deploiement), publiee dans un registre prive et epinglee par empreinte.
+- **Image Galera.** Elle reste une archive reconstruite localement : 2 CRITICAL et 82 HIGH Debian sans correctif publie, plus 21 failles HIGH dans le binaire Go de Bitnami. En production, il faudrait une source d'images maintenue (abonnement Bitnami, image construite et signee par l'equipe, ou image officielle MariaDB avec un autre mode de deploiement), publiee dans un registre prive et epinglee par empreinte.
 - **Un seul noeud ecrivain.** Si le noeud Galera 0 est indisponible, WordPress attend son redemarrage. Il serait mieux de passer par un proxy SQL (ProxySQL, MaxScale) qui bascule automatiquement.
 - **Alertes ZAP restantes.** Pas de politique CSP, et pas de jeton anti-CSRF sur certains formulaires. Ce sont les prochaines corrections : une CSP adaptee aux scripts de WordPress, puis un nouveau scan.
 - **Labo.** Le groupe `docker` donne en pratique les droits root sur la machine. C'est un risque accepte pour un labo individuel.
-- **Revocation.** Les anciens secrets doivent etre revoques par leurs proprietaires (equipe d'origine, administrateurs Azure et AKS) selon le plan de la section 3.2. Seule la cle de stockage a deja ete revoquee.
+- **Revocation.** Les anciens secrets doivent etre revoques par leurs proprietaires (equipe d'origine, administrateurs Azure et AKS) selon le plan de la section 3.2. Seule la revocation de la cle de stockage est confirmee (2026-10-07).
+- **Documentation d'origine.** Les 47 captures d'ecran du README d'origine, hebergees dans le depot de l'equipe precedente, ont ete retirees : certaines montrent des fichiers de configuration (kubeconfig) et ne pouvaient pas etre verifiees sans risque de recopier un secret.
 - **Bonus.** La phase "Surveiller et reagir" (regle Wazuh, cas TheHive, fiche de reponse) reste a realiser avec les acces a la plateforme SOC du formateur.
 
 ## Annexe : reproduire
 
 ```bash
 minikube start --cpus=4 --memory=5500mb
-minikube image build -t local/mariadb-galera-corrige:12.0.2-r0-correctifs1 images/mariadb-galera
-./scripts/deployer.sh
+./scripts/deployer.sh   # construit aussi l'image Galera corrigee si elle manque
 minikube service -n wordpress wordpress --url
 ./scripts/rendre-manifestes.sh && trivy config rendu && checkov -d rendu --framework kubernetes --config-file .checkov.yaml
 ```
