@@ -1,0 +1,117 @@
+               
+               
+┌─────────────┐
+│ Scan Status │
+└─────────────┘
+  Scanning 29 files tracked by git with 1091 Code rules:
+                                                                                                                        
+  Language      Rules   Files          Origin      Rules                                                                
+ ─────────────────────────────        ───────────────────                                                               
+  <multilang>      49      29          Community    1091                                                                
+  yaml             37       8                                                                                           
+  bash              4       6                                                                                           
+  terraform       114       4                                                                                           
+  json              4       1                                                                                           
+                                                                                                                        
+                
+                
+┌──────────────┐
+│ Scan Summary │
+└──────────────┘
+✅ Scan completed successfully.
+ • Findings: 6 (6 blocking)
+ • Rules run: 206
+ • Targets scanned: 29
+ • Parsed lines: ~100.0%
+ • Scan was limited to files tracked by git
+ • For a detailed list of skipped files and lines, run semgrep with the --verbose flag
+Ran 206 rules on 29 files: 6 findings.
+                   
+                   
+┌─────────────────┐
+│ 6 Code Findings │
+└─────────────────┘
+                                               
+    liqo/quick-start/manifests/hello-world.yaml
+     ❱ [1myaml.kubernetes.security.run-as-non-root.run-as-non-root[0m
+          ❰❰ Blocking ❱❱
+          When running containers in Kubernetes, it's important to ensure that they  are properly secured to  
+          prevent privilege escalation attacks.  One potential vulnerability is when a container is allowed to
+          run  applications as the root user, which could allow an attacker to gain  access to sensitive      
+          resources. To mitigate this risk, it's recommended to  add a `securityContext` to the container,    
+          with the parameter `runAsNonRoot`  set to `true`. This will ensure that the container runs as a non-
+          root user,  limiting the damage that could be caused by any potential attacks. By  adding a         
+          `securityContext` to the container in your Kubernetes pod, you can  help to ensure that your        
+          containerized applications are more secure and  less vulnerable to privilege escalation attacks.    
+          Details: https://sg.run/dgP5                                                                        
+                                                                                                              
+           [32m▶▶┆ Autofix ▶ [0mspec: securityContext: runAsNonRoot: true #
+            7┆ spec:
+   
+    ❯❱ [1myaml.kubernetes.security.allow-privilege-escalation-no-securitycontext.allow-privilege-escalation-no-[0m
+  [1m     securitycontext[0m                                                                                      
+          ❰❰ Blocking ❱❱
+          In Kubernetes, each pod runs in its own isolated environment with its own set of security policies. 
+          However, certain container images may contain `setuid` or `setgid` binaries that could allow an     
+          attacker to perform privilege escalation and gain access to sensitive resources. To mitigate this   
+          risk, it's recommended to add a `securityContext` to the container in the pod, with the parameter   
+          `allowPrivilegeEscalation` set to `false`. This will prevent the container from running any         
+          privileged processes and limit the impact of any potential attacks. By adding a `securityContext` to
+          your Kubernetes pod, you can help to ensure that your containerized applications are more secure and
+          less vulnerable to privilege escalation attacks.                                                    
+          Details: https://sg.run/eleR                                                                        
+                                                                                                              
+           [32m▶▶┆ Autofix ▶ [0msecurityContext: allowPrivilegeEscalation: false name
+            9┆ - name: nginx
+   
+    ❯❱ [1myaml.kubernetes.security.writable-filesystem-container.writable-filesystem-container[0m
+          ❰❰ Blocking ❱❱
+          Container nginx is running with a writable root filesystem. This may allow malicious applications to
+          download and run additional payloads, or modify container files. If an application inside a         
+          container has to save something temporarily consider using a tmpfs. Add 'readOnlyRootFilesystem:    
+          true' to this container to prevent this.                                                            
+          Details: https://sg.run/ZePL                                                                        
+                                                                                                              
+            9┆ - name: nginx
+   
+     ❱ [1myaml.kubernetes.security.run-as-non-root.run-as-non-root[0m
+          ❰❰ Blocking ❱❱
+          When running containers in Kubernetes, it's important to ensure that they  are properly secured to  
+          prevent privilege escalation attacks.  One potential vulnerability is when a container is allowed to
+          run  applications as the root user, which could allow an attacker to gain  access to sensitive      
+          resources. To mitigate this risk, it's recommended to  add a `securityContext` to the container,    
+          with the parameter `runAsNonRoot`  set to `true`. This will ensure that the container runs as a non-
+          root user,  limiting the damage that could be caused by any potential attacks. By  adding a         
+          `securityContext` to the container in your Kubernetes pod, you can  help to ensure that your        
+          containerized applications are more secure and  less vulnerable to privilege escalation attacks.    
+          Details: https://sg.run/dgP5                                                                        
+                                                                                                              
+           [32m▶▶┆ Autofix ▶ [0mspec: securityContext: runAsNonRoot: true #
+           31┆ spec:
+   
+    ❯❱ [1myaml.kubernetes.security.allow-privilege-escalation-no-securitycontext.allow-privilege-escalation-no-[0m
+  [1m     securitycontext[0m                                                                                      
+          ❰❰ Blocking ❱❱
+          In Kubernetes, each pod runs in its own isolated environment with its own set of security policies. 
+          However, certain container images may contain `setuid` or `setgid` binaries that could allow an     
+          attacker to perform privilege escalation and gain access to sensitive resources. To mitigate this   
+          risk, it's recommended to add a `securityContext` to the container in the pod, with the parameter   
+          `allowPrivilegeEscalation` set to `false`. This will prevent the container from running any         
+          privileged processes and limit the impact of any potential attacks. By adding a `securityContext` to
+          your Kubernetes pod, you can help to ensure that your containerized applications are more secure and
+          less vulnerable to privilege escalation attacks.                                                    
+          Details: https://sg.run/eleR                                                                        
+                                                                                                              
+           [32m▶▶┆ Autofix ▶ [0msecurityContext: allowPrivilegeEscalation: false name
+           33┆ - name: nginx
+   
+    ❯❱ [1myaml.kubernetes.security.writable-filesystem-container.writable-filesystem-container[0m
+          ❰❰ Blocking ❱❱
+          Container nginx is running with a writable root filesystem. This may allow malicious applications to
+          download and run additional payloads, or modify container files. If an application inside a         
+          container has to save something temporarily consider using a tmpfs. Add 'readOnlyRootFilesystem:    
+          true' to this container to prevent this.                                                            
+          Details: https://sg.run/ZePL                                                                        
+                                                                                                              
+           33┆ - name: nginx
+

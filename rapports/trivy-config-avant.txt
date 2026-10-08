@@ -1,0 +1,14 @@
+
+Report Summary
+
+┌────────────────┬────────────┬───────────────────┐
+│     Target     │    Type    │ Misconfigurations │
+├────────────────┼────────────┼───────────────────┤
+│ db.yaml        │ kubernetes │         0         │
+├────────────────┼────────────┼───────────────────┤
+│ wordpress.yaml │ kubernetes │         0         │
+└────────────────┴────────────┴───────────────────┘
+Legend:
+- '-': Not scanned
+- '0': Clean (no security findings detected)
+
