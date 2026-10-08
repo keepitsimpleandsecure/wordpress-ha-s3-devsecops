@@ -1,0 +1,12 @@
+Scan gitleaks v8.30.1 du depot d'origine (historique reconstitue), mode --redact
+Constats : 23
+- infra/provider.tf : azure-ad-client-secret x2
+- liqo/config_dev-poc : generic-api-key x1
+- liqo/config_dev-poc : private-key x1
+- liqo/config_dev-poc2 : generic-api-key x1
+- liqo/config_dev-poc2 : private-key x1
+- liqo/quick-start/liqo_kubeconf_dev-poc : generic-api-key x3
+- liqo/quick-start/liqo_kubeconf_dev-poc : private-key x5
+- liqo/quick-start/liqo_kubeconf_dev-poc2 : generic-api-key x3
+- liqo/quick-start/liqo_kubeconf_dev-poc2 : private-key x5
+- wp_values.yaml : generic-api-key x1
