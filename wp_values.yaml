@@ -19,6 +19,13 @@ commonAnnotations:
   checkov.io/skip1: CKV_K8S_40=image Bitnami prevue pour l UID 1001, volumes hostPath de Minikube sans fsGroup, revue 2026-11-08
 
 wordpressUsername: root
+
+# Conteneur durci : jamais root, pas d'escalade de privileges (les autres reglages du chart restent actifs)
+containerSecurityContext:
+  enabled: true
+  runAsNonRoot: true
+  runAsUser: 1001
+  allowPrivilegeEscalation: false
 existingSecret: wordpress-credentials
 
 externalDatabase:
