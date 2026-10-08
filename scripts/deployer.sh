@@ -5,6 +5,11 @@ cd "$(dirname "$0")/.."
 . scripts/versions.env
 helm repo add bitnami https://charts.bitnami.com/bitnami >/dev/null 2>&1 || true
 helm repo update bitnami >/dev/null
+# Image Galera locale : construite dans Minikube si absente (jamais telechargee, pullPolicy Never)
+if ! minikube image ls 2>/dev/null | grep -qx "$IMAGE_GALERA"; then
+  echo "construction de $IMAGE_GALERA"
+  minikube image build -t "$IMAGE_GALERA" images/mariadb-galera >/dev/null
+fi
 kubectl create namespace "$NAMESPACE" --dry-run=client -o yaml | kubectl apply -f - >/dev/null
 ./scripts/creer-secrets.sh
 if [ -d k8s ]; then kubectl -n "$NAMESPACE" apply -f k8s/ >/dev/null && echo "manifestes k8s/ appliques"; fi

@@ -61,10 +61,10 @@ jobs:
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       - name: Construire l'image Galera corrigee
-        run: docker build -t local/mariadb-galera-corrige:ci images/mariadb-galera
+        run: docker build -t localhost/mariadb-galera-corrige:ci images/mariadb-galera
       - name: Images (CRITICAL avec correctif disponible bloquants)
         run: |
-          for img in docker.io/bitnami/wordpress@sha256:845d250ecd73f5e9b8ab2c42ab8b32407992456bab4dcb79547f2c0b7d25959b local/mariadb-galera-corrige:ci; do
+          for img in docker.io/bitnami/wordpress@sha256:845d250ecd73f5e9b8ab2c42ab8b32407992456bab4dcb79547f2c0b7d25959b localhost/mariadb-galera-corrige:ci; do
             echo "== $img"
             docker run --rm -v /var/run/docker.sock:/var/run/docker.sock -v "$PWD:/r" -w /r aquasec/trivy:0.75.0 image --exit-code 1 --severity CRITICAL --ignore-unfixed --ignorefile .trivyignore "$img"
           done
