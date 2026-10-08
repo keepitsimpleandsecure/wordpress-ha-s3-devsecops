@@ -9,12 +9,18 @@ global:
 replicaCount: 2
 
 image:
+  # Image construite a partir de images/mariadb-galera/Dockerfile (base bitnamilegacy epinglee par
+  # empreinte + mises a jour de securite Debian) : 18 CRITICAL corrigibles -> 2 (Go, non corrigibles par apt).
+  # Construction sur le labo : minikube image build -t local/mariadb-galera-corrige:12.0.2-r0-correctifs1 images/mariadb-galera
   registry: docker.io
-  repository: bitnamilegacy/mariadb-galera
-  tag: 12.0.2-debian-12-r0
-  # Aucune image Galera a jour n'est disponible gratuitement : on garde l'archive, epinglee par empreinte.
-  digest: sha256:04060d220627a70f9dd05d2a6ee11d0c2843c47633e78491cfcfd96f97a6d918
-  pullPolicy: Always
+  repository: local/mariadb-galera-corrige
+  tag: 12.0.2-r0-correctifs1
+  pullPolicy: IfNotPresent
+
+# Image locale sans registre : empreinte et pull Always impossibles ici (accepte jusqu'au 2026-11-08).
+commonAnnotations:
+  checkov.io/skip1: CKV_K8S_43=image construite localement dans Minikube, base epinglee par empreinte dans le Dockerfile, revue 2026-11-08
+  checkov.io/skip2: CKV_K8S_15=image locale sans registre, un pull Always echouerait, revue 2026-11-08
 
 existingSecret: db-credentials
 
