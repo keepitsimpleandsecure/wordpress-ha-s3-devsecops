@@ -1,0 +1,5 @@
+# Configuration Checkov du projet.
+# Les constats acceptes sont declares au plus pres de la ressource, par annotations
+# checkov.io/skipN dans db_values.yaml et wp_values.yaml, chacun avec sa raison et sa date de revue.
+compact: true
+quiet: true

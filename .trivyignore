@@ -1,0 +1,5 @@
+# Constats Trivy acceptes. Chaque entree : raison et date de revue.
+# CVE-2025-68121 (Go stdlib) : dans le binaire ini-file fourni par Bitnami dans l'image Galera.
+# Non corrigible par apt (binaire compile par Bitnami, image legacy plus reconstruite).
+# Exposition : outil de configuration utilise au demarrage, pas de service reseau. Revue : 2026-11-08, Robin Lautier.
+CVE-2025-68121

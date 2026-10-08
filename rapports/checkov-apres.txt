@@ -1,0 +1,6 @@
+
+kubernetes scan results:
+
+Passed checks: 182, Failed checks: 0, Skipped checks: 4
+
+
