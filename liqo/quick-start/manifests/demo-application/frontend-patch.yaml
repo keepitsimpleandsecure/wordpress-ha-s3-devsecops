@@ -1,3 +1,4 @@
+# Patch du frontend de la demo : placement (Liqo) et contexte de securite durci
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -5,6 +6,21 @@ metadata:
 spec:
   template:
     spec:
+      automountServiceAccountToken: false
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 10101
+        runAsGroup: 10101
+        seccompProfile:
+          type: RuntimeDefault
+      containers:
+        - name: server
+          securityContext:
+            allowPrivilegeEscalation: false
+            privileged: false
+            readOnlyRootFilesystem: true
+            capabilities:
+              drop: ["ALL"]
       affinity:
         nodeAffinity:
           requiredDuringSchedulingIgnoredDuringExecution:
