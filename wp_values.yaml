@@ -1,0 +1,35 @@
+externalDatabase:
+  host: db-mariadb-galera.default.svc.cluster.local
+  port: 3306
+  user: user
+  password: <DB_PASSWORD>
+  database: wordpress
+
+wordpressDatabaseHost: db-mariadb-galera.default.svc.cluster.local
+wordpressDatabaseName: wordpress
+wordpressDatabaseUser: user
+wordpressDatabasePassword: <DB_PASSWORD>
+wordpressUsername: root
+wordpressPassword: <WP_ADMIN_PASSWORD>
+persistence:
+  enabled: true
+  size: 1Gi
+
+resources:
+  requests:
+    memory: 512Mi
+    cpu: 300m
+  limits:
+    memory: 1Gi
+    cpu: 600m
+mariadb:
+  enabled: false
+
+# wordpressPlugins:
+#   - name: azure-storage
+#     active: true
+
+
+# azureBlobStorage:
+#   accountName: storagek8sdevkhra
+#   containerName: wordpress
