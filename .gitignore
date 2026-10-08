@@ -1,0 +1,21 @@
+# Secrets et acces : ne jamais versionner
+.env
+*.env
+!scripts/versions.env
+kubeconfig*
+*kubeconf*
+config_*
+*-token
+secrets/
+*.pem
+*.key
+
+# Terraform
+*.tfvars
+*.tfstate
+*.tfstate.*
+.terraform/
+
+# Fichiers generes
+rendu/
+rapports/*.tmp

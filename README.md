@@ -1,3 +1,8 @@
+> **Reprise DevSecOps (2026).** Ce depot reprend le projet `wordpress-ha-s3` d'une promotion precedente.
+> Le depot d'origine contenait des secrets commites par erreur (identifiants Azure, kubeconfigs, token, mots de passe) :
+> ils ont ete retires avant la premiere publication et sont consideres compromis.
+> Deploiement local et resultats : voir [RAPPORT.md](RAPPORT.md). Le texte ci-dessous est la documentation d'origine.
+
 # Introduction
 
 Les intervenants Tony, Khellaf, Sami, Wissam, Lucas, Aymane et Soufiane, travaillent sur un projet visant à mettre en place une infrastructure redondante pour héberger un produit en utilisant des clusters et des mécanismes de réplication tels que MariaDB Galera.\
